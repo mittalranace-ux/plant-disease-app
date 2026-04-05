@@ -1,36 +1,42 @@
 import streamlit as st
 import numpy as np
-from PIL import Image
 import tensorflow as tf
+from PIL import Image
+import requests
 
-# Load lightweight pretrained model (MobileNetV2)
-model = tf.keras.applications.MobileNetV2(weights='imagenet')
+# Download model from Google Drive
+@st.cache_resource
+def load_model():
+    url = "PASTE_YOUR_DRIVE_LINK_HERE"
+    model_path = "model.h5"
+    
+    r = requests.get(url)
+    with open(model_path, "wb") as f:
+        f.write(r.content)
+    
+    return tf.keras.models.load_model(model_path)
 
-st.set_page_config(page_title="Plant Disease Detection", page_icon="🌿")
+model = load_model()
 
-st.title("🌿 AI-Based Plant Disease Detection System")
+class_names = [
+    "Apple Scab", "Black Rot", "Cedar Apple Rust", "Healthy"
+]
 
-uploaded_file = st.file_uploader("📤 Upload Leaf Image", type=["jpg","png","jpeg"])
+st.title("🌿 Plant Disease Detection (Real Model)")
+
+uploaded_file = st.file_uploader("Upload Leaf Image", type=["jpg","png","jpeg"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption="📷 Uploaded Image", use_column_width=True)
+    st.image(image)
 
-    # Preprocess image
     img = image.resize((224,224))
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
+    img_array = np.array(img)/255.0
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
 
-    # Prediction
-    predictions = model.predict(img_array)
-    decoded = tf.keras.applications.mobilenet_v2.decode_predictions(predictions, top=1)[0][0]
+    prediction = model.predict(img_array)
+    result = class_names[np.argmax(prediction)]
+    confidence = round(np.max(prediction)*100, 2)
 
-    label = decoded[1]
-    confidence = round(decoded[2]*100, 2)
-
-    # Display
-    st.success(f"🔍 Detected: {label}")
+    st.success(f"🌱 Disease: {result}")
     st.info(f"📊 Confidence: {confidence}%")
-
-   
