@@ -1,1 +1,4 @@
-requirements.txt
+streamlit
+tensorflow
+numpy
+pillow
