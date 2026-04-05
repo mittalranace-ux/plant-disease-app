@@ -33,4 +33,4 @@ if uploaded_file is not None:
     st.success(f"🔍 Detected: {label}")
     st.info(f"📊 Confidence: {confidence}%")
 
-    st.warning("⚠️ Note: This is a demo using pretrained model. Actual system uses ResNet50 trained on PlantVillage dataset.")
+   
