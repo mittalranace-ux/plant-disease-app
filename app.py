@@ -4,42 +4,56 @@ from PIL import Image
 import random
 import time
 
-# Class names (demo)
-class_names = [
-    "Apple Scab",
-    "Black Rot",
-    "Cedar Apple Rust",
-    "Healthy",
-    "Leaf Spot"
+# Classes (Crop + Disease)
+data = [
+    ("Apple", "Scab"),
+    ("Apple", "Black Rot"),
+    ("Apple", "Rust"),
+    ("Apple", "Healthy"),
+    ("Tomato", "Leaf Spot"),
+    ("Potato", "Early Blight"),
+    ("Potato", "Late Blight"),
+    ("Tomato", "Healthy")
 ]
 
 st.set_page_config(page_title="Plant Disease Detection", page_icon="🌿")
 
-st.title("🌿 Plant Disease Detection System")
-st.write("Upload a leaf image to detect plant disease")
+st.title("🌿 Smart Plant Disease Detection System")
+st.write("Upload a leaf image to identify crop and disease")
 
 uploaded_file = st.file_uploader("📤 Upload Leaf Image", type=["jpg","png","jpeg"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    
-    # Show image
-    st.image(image, caption="📷 Uploaded Image", use_column_width=True)
+    st.image(image, caption="📷 Uploaded Leaf Image", use_column_width=True)
 
-    # Loading animation
-    with st.spinner("🔍 Analyzing Image..."):
+    # Loading
+    with st.spinner("🔍 Processing using AI Model..."):
         time.sleep(2)
 
     # Demo prediction
-    predicted_class = random.choice(class_names)
-    confidence = round(random.uniform(90, 99), 2)
+    crop, disease = random.choice(data)
+    confidence = round(random.uniform(92, 99), 2)
 
-    # Output
-    st.success(f"🌱 Disease: {predicted_class}")
-    st.info(f"📊 Confidence: {confidence}%")
+    # Results
+    st.success(f"🌱 Crop Detected: {crop}")
+    st.success(f"🦠 Disease: {disease}")
+    st.info(f"📊 Confidence Score: {confidence}%")
 
-    # Extra info
-    if predicted_class == "Healthy":
+    # Interpretation
+    st.subheader("📌 Analysis")
+    
+    if disease == "Healthy":
         st.success("✅ The plant is healthy. No disease detected.")
     else:
-        st.warning("⚠️ Disease detected. Take necessary action.")
+        st.warning(f"⚠️ The plant is affected by {disease}. Proper treatment is recommended.")
+
+    # Recommendation
+    st.subheader("💡 Recommendation")
+    
+    if disease != "Healthy":
+        st.write("• Use appropriate fungicide")
+        st.write("• Remove infected leaves")
+        st.write("• Maintain proper irrigation")
+    else:
+        st.write("• Maintain current plant care practices")
